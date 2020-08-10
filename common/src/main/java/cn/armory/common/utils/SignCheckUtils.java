@@ -13,10 +13,9 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 
 /**
- * @author dajian
- * @packagename cn.depot.common.utils
- * @date 2020/7/30
  * @describe 此类用于校验签名是否正确 防止恶意更改app
+ * 在启动页创建SignCheckUtils对象，并在构造方法传入sha1值
+ * 调用check()方法
  */
 public class SignCheckUtils {
     private Context context;

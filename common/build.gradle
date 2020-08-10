@@ -2,13 +2,13 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 group = 'com.github.armory'
 android {
-    compileSdkVersion 26
+    compileSdkVersion rootProject.ext.android.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion 19
-        targetSdkVersion 26
-        versionCode 100
-        versionName "1.0.0"
+        minSdkVersion rootProject.ext.android.minSdkVersion
+        targetSdkVersion rootProject.ext.android.targetSdkVersion
+        versionCode rootProject.ext.android.versionCode
+        versionName rootProject.ext.android.versionName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "proguard-rules.pro"
@@ -24,7 +24,15 @@ android {
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    testImplementation 'junit:junit:4.12'
-    implementation 'com.android.support:appcompat-v7:26.1.0'
+    implementation rootProject.ext.support['appcompat-v7']
+    implementation rootProject.ext.dependencies['converter-gson']
+    implementation rootProject.ext.dependencies['adapter-rxjava']
+    implementation rootProject.ext.dependencies.rxjava
+    implementation rootProject.ext.dependencies.rxandroid
+    implementation rootProject.ext.dependencies.location
+    implementation rootProject.ext.dependencies.retrofit
+    implementation rootProject.ext.dependencies['logging-interceptor']
+
+    testImplementation rootProject.ext.support.junit
 
 }
