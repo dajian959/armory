@@ -26,13 +26,15 @@ dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation rootProject.ext.support['appcompat-v7']
     implementation rootProject.ext.dependencies['converter-gson']
-    implementation rootProject.ext.dependencies['adapter-rxjava']
+    api rootProject.ext.dependencies['adapter-rxjava']
     implementation rootProject.ext.dependencies.rxjava
     implementation rootProject.ext.dependencies.rxandroid
     implementation rootProject.ext.dependencies.location
     implementation rootProject.ext.dependencies.retrofit
     implementation rootProject.ext.dependencies['logging-interceptor']
-
+    implementation rootProject.ext.dependencies.butterknife
+    implementation rootProject.ext.dependencies.GADownloading
+    annotationProcessor rootProject.ext.dependencies['butterknife-compiler']
     testImplementation rootProject.ext.support.junit
 
 }

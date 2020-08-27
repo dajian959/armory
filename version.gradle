@@ -3,7 +3,7 @@ ext {
     android = [
             compileSdkVersion: 26,
             applicationId    : "cn.armory.explore",
-            minSdkVersion    : 15,
+            minSdkVersion    : 16,
             targetSdkVersion : 26,
             versionCode      : 101,
             versionName      : "1.0.1",
@@ -51,7 +51,10 @@ ext {
             //material-dialogs
             "material-dialogs-core"   : "com.afollestad.material-dialogs:core:0.9.4.5",
             "material-dialogs-commons": "com.afollestad.material-dialogs:commons:0.9.4.5",
-
+            "butterknife"             : 'com.jakewharton:butterknife:8.8.1',
+            "butterknife-compiler"    : 'com.jakewharton:butterknife-compiler:8.8.1',
+            //下载动画
+            "GADownloading": 'com.github.Ajian-studio:GADownloading:v1.0.2',
             //Google AAC
             "lifecycle-extensions"    : "android.arch.lifecycle:extensions:1.1.1",
             "lifecycle-compiler"      : "android.arch.lifecycle:compiler:1.1.1",

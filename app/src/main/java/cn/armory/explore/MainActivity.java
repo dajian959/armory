@@ -1,13 +1,24 @@
 package cn.armory.explore;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import cn.armory.common.base.BaseActivity;
+import cn.armory.common.base.BasePresenter;
+import cn.armory.common.base.BaseView;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends BaseActivity<BasePresenter<BaseView>> {
+
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+    protected BasePresenter<BaseView> createPresenter() {
+        return null;
+    }
+
+    @Override
+    protected int getLayoutId() {
+        return 0;
+    }
+
+    @Override
+    protected void initData() {
+
     }
 }

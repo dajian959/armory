@@ -7,6 +7,8 @@ import java.io.File;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import cn.armory.common.base.BaseObserver;
+import cn.armory.common.base.FileObserver;
 import cn.armory.common.http.interceptor.BaseInterceptor;
 import cn.armory.common.http.interceptor.CacheInterceptor;
 import cn.armory.common.http.interceptor.Level;
@@ -14,8 +16,8 @@ import cn.armory.common.http.interceptor.LoggingInterceptor;
 import cn.armory.common.utils.ACUtils;
 import cn.armory.common.utils.Logger;
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.Cache;
 import okhttp3.ConnectionPool;
@@ -44,6 +46,7 @@ public class HttpManager {
     private Cache cache = null;
     private File httpCacheDirectory;
     private static volatile HttpManager manager;
+    private static CompositeDisposable compositeDisposable;
 
     /**
      * @param url         全局url
@@ -92,6 +95,7 @@ public class HttpManager {
         HttpsUtils.SSLParams sslParams = HttpsUtils.getSslSocketFactory();
         okHttpClient = new OkHttpClient.Builder()
                 .cache(cache)
+                // .cookieJar(new CookieJarImpl(new PersistentCookieStore(mContext)))
                 .addInterceptor(new BaseInterceptor(headers))
                 .addInterceptor(new CacheInterceptor(mContext))
                 .sslSocketFactory(sslParams.sSLSocketFactory, sslParams.trustManager)
@@ -132,23 +136,38 @@ public class HttpManager {
     }
 
     /**
-     * /**
-     * execute your customer API
-     * For example:
-     * MyApiService service =
-     * RetrofitClient.getInstance(MainActivity.this).create(MyApiService.class);
-     * <p>
-     * RetrofitClient.getInstance(MainActivity.this)
-     * .execute(service.lgon("name", "password"), subscriber)
-     * * @param subscriber
+     * 普通的网络请求
+     *
+     * @param observable
+     * @param observer
      */
-
-    public static <T> T execute(Observable<T> observable, Observer<T> subscriber) {
-        observable.subscribeOn(Schedulers.io())
-                .unsubscribeOn(Schedulers.io())
+    public static void request(Observable<?> observable, BaseObserver observer) {
+        if (compositeDisposable == null) {
+            compositeDisposable = new CompositeDisposable();
+        }
+        compositeDisposable.add(observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(subscriber);
+                .subscribeWith(observer));
+    }
 
-        return null;
+    /**
+     * 网络文件请求
+     *
+     * @param observable
+     * @param observer
+     */
+    public static void requestFile(Observable<?> observable, FileObserver observer) {
+        if (compositeDisposable == null) {
+            compositeDisposable = new CompositeDisposable();
+        }
+        compositeDisposable.add(observable.subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeWith(observer));
+    }
+
+    public static void removeDisposable() {
+        if (compositeDisposable != null) {
+            compositeDisposable.dispose();
+        }
     }
 }
