@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -12,6 +13,7 @@ import android.widget.EditText;
 
 import butterknife.ButterKnife;
 import cn.armory.common.http.HttpManager;
+import cn.armory.common.utils.ACUtils;
 import cn.armory.common.utils.KeyBoardUtils;
 import cn.armory.common.view.LoadingDialog;
 import cn.armory.common.view.ProgressDialog;
@@ -182,9 +184,6 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
         startActivityForResult(intent, requestCode);
     }
 
-    /**
-     * 以下是关于软键盘的处理
-     */
 
     /**
      * 清除editText的焦点
@@ -202,6 +201,93 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
             }
         }
     }
+
+
+    /**
+     * 添加fragment
+     *
+     * @param fragment
+     * @param frameId
+     */
+    public void addFragment(BaseFragment fragment, @IdRes int frameId) {
+        ACUtils.checkNotNull(fragment);
+        getSupportFragmentManager().beginTransaction()
+                .add(frameId, fragment, fragment.getClass().getSimpleName())
+                .addToBackStack(fragment.getClass().getSimpleName())
+                .commitAllowingStateLoss();
+
+    }
+
+
+    /**
+     * 替换fragment
+     *
+     * @param fragment
+     * @param frameId
+     */
+    public void replaceFragment(BaseFragment fragment, @IdRes int frameId) {
+        ACUtils.checkNotNull(fragment);
+        getSupportFragmentManager().beginTransaction()
+                .replace(frameId, fragment, fragment.getClass().getSimpleName())
+                .addToBackStack(fragment.getClass().getSimpleName())
+                .commitAllowingStateLoss();
+
+    }
+
+
+    /**
+     * 隐藏fragment
+     *
+     * @param fragment
+     */
+    public void hideFragment(BaseFragment fragment) {
+        ACUtils.checkNotNull(fragment);
+        getSupportFragmentManager().beginTransaction()
+                .hide(fragment)
+                .commitAllowingStateLoss();
+
+    }
+
+
+    /**
+     * 显示fragment
+     *
+     * @param fragment
+     */
+    public void showFragment(BaseFragment fragment) {
+        ACUtils.checkNotNull(fragment);
+        getSupportFragmentManager().beginTransaction()
+                .show(fragment)
+                .commitAllowingStateLoss();
+
+    }
+
+
+    /**
+     * 移除fragment
+     *
+     * @param fragment
+     */
+    public void removeFragment(BaseFragment fragment) {
+        ACUtils.checkNotNull(fragment);
+        getSupportFragmentManager().beginTransaction()
+                .remove(fragment)
+                .commitAllowingStateLoss();
+
+    }
+
+
+    /**
+     * 弹出栈顶部的Fragment
+     */
+    public void popFragment() {
+        if (getSupportFragmentManager().getBackStackEntryCount() > 1) {
+            getSupportFragmentManager().popBackStack();
+        } else {
+            finish();
+        }
+    }
+
 
     /**
      * 隐藏键盘

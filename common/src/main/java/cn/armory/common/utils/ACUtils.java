@@ -3,10 +3,13 @@ package cn.armory.common.utils;
 import android.annotation.SuppressLint;
 import android.app.Application;
 import android.content.Context;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
+import android.support.annotation.StringRes;
 
 /**
- * 可获取 ApplicationContext 对象.
+ * Context相关.
  */
 
 public class ACUtils {
@@ -55,5 +58,41 @@ public class ACUtils {
         }
 
         throw new NullPointerException("u should init first");
+    }
+
+    /**
+     * 全局获取String的方法
+     *
+     * @param id 资源Id
+     * @return String
+     */
+    public static String getString(@StringRes int id) {
+        return mContext.getResources().getString(id);
+    }
+
+    /**
+     * 判断App是否是Debug版本
+     *
+     * @return {@code true}: 是<br>{@code false}: 否
+     */
+    public static boolean isAppDebug() {
+
+        if (CheckStringUtils.isSpace(mContext.getPackageName())) return false;
+        try {
+            PackageManager pm = mContext.getPackageManager();
+            ApplicationInfo ai = pm.getApplicationInfo(mContext.getPackageName(), 0);
+            return ai != null && (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
+
+    public static <T> T checkNotNull(T obj) {
+        if (obj == null) {
+            throw new NullPointerException();
+        }
+        return obj;
     }
 }

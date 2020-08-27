@@ -255,6 +255,15 @@ public class BarUtils {
         }
     }
 
+    public static boolean supportStatusBarLightMode(Activity activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return BarUtils.setStatusBarModeByFlyme(activity, true)
+                    || BarUtils.setStatusBarModeByMIUI(activity, true)
+                    || Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
+        }
+        return false;
+    }
+
     /**
      * 设置状态栏图标为深色和魅族特定的文字风格
      * 可以用来判断是否为Flyme用户

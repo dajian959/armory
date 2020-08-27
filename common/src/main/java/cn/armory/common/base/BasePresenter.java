@@ -4,11 +4,12 @@ package cn.armory.common.base;
 import java.lang.ref.Reference;
 import java.lang.ref.SoftReference;
 
-public abstract class BasePresenter<T extends BaseView> {
+public abstract class BasePresenter<T extends BaseView, M extends BaseModel> {
 
     //View接口类型的软引用
     protected Reference<T> mViewRef;
     protected T mView;
+    protected M mModel;
 
     public void attachView(T view) {
         //建立关系
@@ -31,4 +32,8 @@ public abstract class BasePresenter<T extends BaseView> {
         if (mView != null)
             mView = null;
     }
+
+    // 创建Model实例
+    protected abstract M createModel();
+
 }
