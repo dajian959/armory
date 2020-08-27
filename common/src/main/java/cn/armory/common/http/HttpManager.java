@@ -141,6 +141,7 @@ public class HttpManager {
      * @param observable
      * @param observer
      */
+    @SuppressWarnings("unchecked")
     public static void request(Observable<?> observable, BaseObserver observer) {
         if (compositeDisposable == null) {
             compositeDisposable = new CompositeDisposable();
@@ -156,6 +157,7 @@ public class HttpManager {
      * @param observable
      * @param observer
      */
+    @SuppressWarnings("unchecked")
     public static void requestFile(Observable<?> observable, FileObserver observer) {
         if (compositeDisposable == null) {
             compositeDisposable = new CompositeDisposable();

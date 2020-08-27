@@ -45,10 +45,20 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
         this.initData();
     }
 
+    /**
+     * 设置加载框
+     *
+     * @return
+     */
     protected Dialog setLoadingDialog() {
         return new LoadingDialog(this);
     }
 
+    /**
+     * 设置进度框
+     *
+     * @return
+     */
     protected Dialog setProgressDialog() {
         return new ProgressDialog(this);
     }
@@ -89,7 +99,7 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
         }
     }
 
-
+    @SuppressWarnings("unchecked")
     @Override
     protected void onResume() {
         super.onResume();
@@ -101,14 +111,19 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     protected void onDestroy() {
         super.onDestroy();
         ButterKnife.bind(this).unbind();
-        if (mPresenter != null)
-            mPresenter.detachView();
 
         if (loadingDialog != null)
             loadingDialog.dismiss();
 
         if (progressDialog != null)
             progressDialog.dismiss();
+
+        if (mPresenter != null)
+            mPresenter.detachView();
+
+        if (mPresenter != null)
+            mPresenter = null;
+
         HttpManager.removeDisposable();
     }
 
