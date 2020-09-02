@@ -1,7 +1,6 @@
 package cn.armory.common.base;
 
 import android.app.Dialog;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -20,10 +19,9 @@ import cn.armory.common.view.ProgressDialog;
 
 
 /**
- * File descripition: activity基类
+ * activity基类
  */
 public abstract class BaseActivity<P extends BasePresenter> extends AppCompatActivity implements BaseView {
-    public Context mContext;
     protected P mPresenter;
 
     protected abstract P createPresenter();
@@ -34,21 +32,20 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ButterKnife.bind(this);
-        mContext = this;
         setContentView(getLayoutId());
+        ButterKnife.bind(this);
         mPresenter = createPresenter();
         loadingDialog = setLoadingDialog();
         progressDialog = setProgressDialog();
         setStatusBar();
-        setScreenRoate(true);
+        setScreenRotate(true);
         this.initData();
     }
 
     /**
      * 设置加载框
      *
-     * @return
+     * @return Dialog
      */
     protected Dialog setLoadingDialog() {
         return new LoadingDialog(this);
@@ -57,7 +54,7 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     /**
      * 设置进度框
      *
-     * @return
+     * @return Dialog
      */
     protected Dialog setProgressDialog() {
         return new ProgressDialog(this);
@@ -66,7 +63,7 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     /**
      * 获取布局ID
      *
-     * @return
+     * @return int
      */
     protected abstract int getLayoutId();
 
@@ -161,7 +158,7 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     /**
      * [页面跳转]
      *
-     * @param clz
+     * @param clz 跳转的Activity
      */
     public void startActivity(Class<?> clz) {
         startActivity(clz, null);
@@ -171,8 +168,8 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     /**
      * [携带数据的页面跳转]
      *
-     * @param clz
-     * @param bundle
+     * @param clz    跳转的Activity
+     * @param bundle bundle添加的参数
      */
     public void startActivity(Class<?> clz, Bundle bundle) {
         Intent intent = new Intent();
@@ -186,9 +183,9 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     /**
      * [含有Bundle通过Class打开编辑界面]
      *
-     * @param cls
-     * @param bundle
-     * @param requestCode
+     * @param cls         跳转的Activity
+     * @param bundle      bundle添加的参数
+     * @param requestCode 请求码
      */
     public void startActivityForResult(Class<?> cls, Bundle bundle, int requestCode) {
         Intent intent = new Intent();
@@ -221,8 +218,8 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     /**
      * 添加fragment
      *
-     * @param fragment
-     * @param frameId
+     * @param fragment 添加的fragment
+     * @param frameId  布局id
      */
     public void addFragment(BaseFragment fragment, @IdRes int frameId) {
         ACUtils.checkNotNull(fragment);
@@ -237,8 +234,8 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     /**
      * 替换fragment
      *
-     * @param fragment
-     * @param frameId
+     * @param fragment 替换的fragment
+     * @param frameId  布局id
      */
     public void replaceFragment(BaseFragment fragment, @IdRes int frameId) {
         ACUtils.checkNotNull(fragment);
@@ -253,7 +250,7 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     /**
      * 隐藏fragment
      *
-     * @param fragment
+     * @param fragment 隐藏的fragment
      */
     public void hideFragment(BaseFragment fragment) {
         ACUtils.checkNotNull(fragment);
@@ -267,7 +264,7 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     /**
      * 显示fragment
      *
-     * @param fragment
+     * @param fragment 显示的fragment
      */
     public void showFragment(BaseFragment fragment) {
         ACUtils.checkNotNull(fragment);
@@ -281,7 +278,7 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     /**
      * 移除fragment
      *
-     * @param fragment
+     * @param fragment 移除的fragment
      */
     public void removeFragment(BaseFragment fragment) {
         ACUtils.checkNotNull(fragment);
@@ -383,10 +380,10 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     /**
      * 设置屏幕横竖屏切换
      *
-     * @param screenRoate true  竖屏     false  横屏
+     * @param screenRotate true  竖屏     false  横屏
      */
-    private void setScreenRoate(Boolean screenRoate) {
-        if (screenRoate) {
+    private void setScreenRotate(Boolean screenRotate) {
+        if (screenRotate) {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);//设置竖屏模式
         } else {
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
