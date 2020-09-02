@@ -9,6 +9,7 @@ import java.net.ConnectException;
 import java.net.UnknownHostException;
 import java.text.ParseException;
 
+import cn.armory.common.http.HttpManager;
 import io.reactivex.observers.DisposableObserver;
 import retrofit2.HttpException;
 
@@ -59,14 +60,11 @@ public abstract class BaseObserver<T> extends DisposableObserver<Result<T>> {
             if (view != null) {
                 view.hideLoading();
             }
-
-            onSuccess(o);
-
-            //非  true的所有情况
-            onException(PARSE_ERROR, o.getMsg());
+            if (o.getCode() == HttpManager.code)
+                onSuccess(o);
+            else onError(o.getMsg());
         } catch (Exception e) {
-            e.printStackTrace();
-            onError(e.toString());
+            onError(e);
         }
     }
 
@@ -93,7 +91,8 @@ public abstract class BaseObserver<T> extends DisposableObserver<Result<T>> {
             e.printStackTrace();
         } else {
             if (e != null) {
-                onError(e.toString());
+                e.printStackTrace();
+                onException(NOT_TRUE_OVER, e.getMessage());
             } else {
                 onError("未知错误");
             }
@@ -126,9 +125,7 @@ public abstract class BaseObserver<T> extends DisposableObserver<Result<T>> {
     //消失写到这 有一定的延迟  对dialog显示有影响
     @Override
     public void onComplete() {
-       /* if (view != null) {
-            view.hideLoading();
-        }*/
+
     }
 
     public abstract void onSuccess(Result<T> o);

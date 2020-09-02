@@ -81,7 +81,8 @@ public abstract class FileObserver<T> extends DisposableObserver<T> {
             e.printStackTrace();
         } else {
             if (e != null) {
-                onError(e.toString());
+                e.printStackTrace();
+                onException(NOT_TRUE_OVER, e.getMessage());
             } else {
                 onError("未知错误");
             }

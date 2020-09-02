@@ -40,6 +40,7 @@ public class HttpManager {
     public static String baseUrl = "";
     public static boolean debug = false;
     public static String version = "";
+    public static int code = 0;
     private static Context mContext = ACUtils.getApplicationContext();
     private static OkHttpClient okHttpClient;
     private static Retrofit retrofit;
@@ -49,15 +50,18 @@ public class HttpManager {
     private static CompositeDisposable compositeDisposable;
 
     /**
+     * 请在application的onCreate()调用此方法
+     *
      * @param url         全局url
-     * @param isDebug     是否debug
-     * @param versionName 版本号
-     *                    请在application的onCreate()调用此方法
+     * @param successCode 网络请求返回的状态码---正确拿到数据的状态码
+     * @param isDebug     是否debug---BuildConfig.BUILD_TYPE
+     * @param versionName 版本号---BuildConfig.VERSION_NAME
      */
-    public static void init(String url, boolean isDebug, String versionName) {
+    public static void init(String url, int successCode, boolean isDebug, String versionName) {
         baseUrl = url;
         debug = isDebug;
         version = versionName;
+        code = successCode;
     }
 
     public static HttpManager getInstance() {
