@@ -43,7 +43,8 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     }
 
     /**
-     * 设置加载框
+     * 重写该方法以设置加载框
+     * 否则将使用默认加载框
      *
      * @return Dialog
      */
@@ -52,7 +53,8 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
     }
 
     /**
-     * 设置进度框
+     * 重写该方法以设置进度框
+     * 否则将使用默认进度框
      *
      * @return Dialog
      */

@@ -1,5 +1,6 @@
 package cn.armory.explore.activity;
 
+import android.app.Dialog;
 import android.view.View;
 import android.widget.Button;
 
@@ -38,7 +39,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements Calenda
     protected void initData() {
         int year = mCalendarView.getCurYear();
         int month = mCalendarView.getCurMonth();
-
+        mPresenter.getList();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

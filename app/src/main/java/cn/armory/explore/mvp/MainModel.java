@@ -1,6 +1,9 @@
 package cn.armory.explore.mvp;
 
 import cn.armory.common.base.BaseModel;
+import cn.armory.common.http.HttpManager;
+import cn.armory.explore.bean.TextBean;
+import io.reactivex.Observable;
 
 /**
  * @author gjq
@@ -9,7 +12,7 @@ import cn.armory.common.base.BaseModel;
  * @describe
  */
 public class MainModel implements BaseModel {
-    public void getCC(){
-
-    };
+    public Observable<TextBean> getCC() {
+        return HttpManager.getInstance().getService(HttpInterface.class).getSplash(null);
+    }
 }
