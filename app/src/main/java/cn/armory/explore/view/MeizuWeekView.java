@@ -19,7 +19,7 @@ public class MeizuWeekView extends WeekView {
     private float mRadio;
     private int mPadding;
     private float mSchemeBaseLine;
-
+    Paint paint = new Paint();
     public MeizuWeekView(Context context) {
         super(context);
 
@@ -27,7 +27,12 @@ public class MeizuWeekView extends WeekView {
         mTextPaint.setColor(0xffffffff);
         mTextPaint.setAntiAlias(true);
         mTextPaint.setFakeBoldText(true);
-
+        paint.setAntiAlias(true);
+        paint.setStyle(Paint.Style.FILL);
+        paint.setTextAlign(Paint.Align.CENTER);
+        paint.setColor(0xffed5353);
+        paint.setFakeBoldText(true);
+        paint.setTextSize(dipToPx(context, 11));
         mSchemeBasicPaint.setAntiAlias(true);
         mSchemeBasicPaint.setStyle(Paint.Style.FILL);
         mSchemeBasicPaint.setTextAlign(Paint.Align.CENTER);
@@ -49,7 +54,7 @@ public class MeizuWeekView extends WeekView {
     @Override
     protected boolean onDrawSelected(Canvas canvas, Calendar calendar, int x, boolean hasScheme) {
         mSelectedPaint.setStyle(Paint.Style.FILL);
-        canvas.drawRect(x + mPadding, mPadding, x + mItemWidth - mPadding, mItemHeight - mPadding, mSelectedPaint);
+        canvas.drawRect(x, 10, x + mItemWidth,  mItemHeight-10, mSelectedPaint);
         return true;
     }
 
@@ -57,11 +62,10 @@ public class MeizuWeekView extends WeekView {
     protected void onDrawScheme(Canvas canvas, Calendar calendar, int x) {
         mSchemeBasicPaint.setColor(calendar.getSchemeColor());
 
-        canvas.drawCircle(x + mItemWidth - mPadding - mRadio / 2, mPadding + mRadio, mRadio, mSchemeBasicPaint);
-
-        canvas.drawText(calendar.getScheme(),
-                x + mItemWidth - mPadding - mRadio / 2 - getTextWidth(calendar.getScheme()) / 2,
-                mPadding + mSchemeBaseLine, mTextPaint);
+        if (calendar.getScheme().length() > 4)
+            canvas.drawText(calendar.getScheme().substring(0, 3) + "...", x + mItemWidth / 2,  mItemHeight - 47, paint);
+        else
+            canvas.drawText(calendar.getScheme(), x + mItemWidth / 2,  mItemHeight - 47, paint);
     }
 
     private float getTextWidth(String text) {
@@ -76,7 +80,7 @@ public class MeizuWeekView extends WeekView {
 
         boolean isInRange = isInRange(calendar);
 
-        if (isSelected) {
+        if (isSelected&&!hasScheme) {
             canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top,
                     mSelectTextPaint);
             canvas.drawText(calendar.getLunar(), cx, mTextBaseLine + mItemHeight / 10, mSelectedLunarTextPaint);
@@ -84,7 +88,7 @@ public class MeizuWeekView extends WeekView {
             canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top,
                     calendar.isCurrentMonth() && isInRange ? mSchemeTextPaint : mOtherMonthTextPaint);
 
-            canvas.drawText(calendar.getLunar(), cx, mTextBaseLine + mItemHeight / 10, mCurMonthLunarTextPaint);
+           // canvas.drawText(calendar.getLunar(), cx, mTextBaseLine + mItemHeight / 10, mCurMonthLunarTextPaint);
         } else {
             canvas.drawText(String.valueOf(calendar.getDay()), cx, mTextBaseLine + top,
                     calendar.isCurrentDay() && isInRange ? mCurDayTextPaint :

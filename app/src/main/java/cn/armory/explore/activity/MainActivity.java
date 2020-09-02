@@ -39,7 +39,7 @@ public class MainActivity extends BaseActivity<MainPresenter> implements Calenda
     protected void initData() {
         int year = mCalendarView.getCurYear();
         int month = mCalendarView.getCurMonth();
-        mPresenter.getList();
+       // mPresenter.getList();
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

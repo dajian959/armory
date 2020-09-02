@@ -29,6 +29,7 @@
             app:max_year="2022"
             app:min_year="2004"
             app:month_view="cn.armory.explore.view.MeiZuMonthView"
+            app:week_view="cn.armory.explore.view.MeizuWeekView"
             app:month_view_show_mode="mode_all"
             app:other_month_lunar_text_color="#e1e1e1"
             app:other_month_text_color="#e1e1e1"
