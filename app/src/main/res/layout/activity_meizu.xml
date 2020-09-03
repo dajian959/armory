@@ -8,7 +8,13 @@
     android:fitsSystemWindows="true"
     android:orientation="vertical"
     tools:ignore="RtlHardcoded,HardcodedText,RtlSymmetry,SmallSp">
-
+<TextView
+    android:id="@+id/date"
+    android:gravity="center"
+    android:textColor="#333333"
+    android:text="@string/date"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"/>
     <com.haibin.calendarview.CalendarLayout
         android:id="@+id/ccc"
         android:layout_width="match_parent"

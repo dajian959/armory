@@ -1,8 +1,8 @@
 package cn.armory.explore.activity;
 
-import android.app.Dialog;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.haibin.calendarview.Calendar;
 import com.haibin.calendarview.CalendarLayout;
@@ -24,6 +24,8 @@ public class MainActivity extends BaseActivity<MainPresenter> implements Calenda
     Button button;
     @BindView(R.id.ccc)
     CalendarLayout calendarLayout;
+    @BindView(R.id.date)
+    TextView date;
 
     @Override
     protected MainPresenter createPresenter() {
@@ -39,7 +41,8 @@ public class MainActivity extends BaseActivity<MainPresenter> implements Calenda
     protected void initData() {
         int year = mCalendarView.getCurYear();
         int month = mCalendarView.getCurMonth();
-       // mPresenter.getList();
+        // mPresenter.getList();
+        date.setText(getString(R.string.date, mCalendarView.getSelectedCalendar().getYear(), mCalendarView.getSelectedCalendar().getMonth()));
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -57,7 +60,13 @@ public class MainActivity extends BaseActivity<MainPresenter> implements Calenda
                 getSchemeCalendar(year, month, 6, 0xFFdf1356, "查询"));
         //此方法在巨大的数据量上不影响遍历性能，推荐使用
         mCalendarView.setSchemeDate(map);
+        mCalendarView.setOnMonthChangeListener(new CalendarView.OnMonthChangeListener() {
+            @Override
+            public void onMonthChange(int year, int month) {
+                date.setText(getString(R.string.date, year, month));
 
+            }
+        });
     }
 
     private Calendar getSchemeCalendar(int year, int month, int day, int color, String text) {
