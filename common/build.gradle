@@ -35,6 +35,8 @@ dependencies {
     implementation rootProject.ext.dependencies.butterknife
     implementation rootProject.ext.dependencies.GADownloading
     annotationProcessor rootProject.ext.dependencies['butterknife-compiler']
+    implementation rootProject.ext.dependencies.glide
+    implementation rootProject.ext.dependencies['glide-compiler']
     testImplementation rootProject.ext.support.junit
 
 }
