@@ -8,22 +8,13 @@ import android.widget.EditText;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
-/**
- * <pre>
- *  author : wyz
- *  e_mail : xxx@xx
- *  time  : 2017/06/${DYA}
- *  desc :
- *  version: 1.0
- * </pre>
- */
 
 public class KeyBoardUtils {
 
     /**
      * 打开键盘
      **/
-    public static void openKeybord(View v) {
+    public static void openKeyboard(View v) {
         InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (!imm.isActive()) {
             imm.showSoftInput(v, InputMethodManager.SHOW_FORCED);
@@ -37,8 +28,9 @@ public class KeyBoardUtils {
      * 4. * @param v
      * 5.
      */
-    public static void closeKeybord(View v) {
+    public static void closeKeyboard(View v) {
         InputMethodManager imm = (InputMethodManager) v.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+        assert imm != null;
         if (imm.isActive()) {
             imm.hideSoftInputFromWindow(v.getApplicationWindowToken(), 0);
         }
@@ -54,6 +46,7 @@ public class KeyBoardUtils {
      */
     public static boolean setIMM(Context context, View view, boolean visible) {
         InputMethodManager imm = (InputMethodManager) context.getSystemService(Context.INPUT_METHOD_SERVICE);
+        assert imm != null;
         if (visible) {
             return imm.showSoftInput(view, InputMethodManager.SHOW_FORCED);
         } else {
@@ -87,6 +80,7 @@ public class KeyBoardUtils {
      */
     public static void showInput(EditText mEditText, Context mContext) {
         InputMethodManager imm = (InputMethodManager) mContext.getSystemService(INPUT_METHOD_SERVICE);
+        assert imm != null;
         imm.showSoftInput(mEditText, InputMethodManager.RESULT_SHOWN);
         imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, InputMethodManager.HIDE_IMPLICIT_ONLY);
 

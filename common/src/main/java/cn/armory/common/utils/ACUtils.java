@@ -60,15 +60,6 @@ public class ACUtils {
         throw new NullPointerException("u should init first");
     }
 
-    /**
-     * 全局获取String的方法
-     *
-     * @param id 资源Id
-     * @return String
-     */
-    public static String getString(@StringRes int id) {
-        return mContext.getResources().getString(id);
-    }
 
     /**
      * 判断App是否是Debug版本
