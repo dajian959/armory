@@ -11,9 +11,12 @@ import android.view.View;
 import android.widget.EditText;
 
 import butterknife.ButterKnife;
+import cn.armory.common.R;
 import cn.armory.common.http.HttpManager;
 import cn.armory.common.utils.ACUtils;
+import cn.armory.common.utils.AntiHijackingUtils;
 import cn.armory.common.utils.KeyBoardUtils;
+import cn.armory.common.utils.ToastUtils;
 import cn.armory.common.view.LoadingDialog;
 import cn.armory.common.view.ProgressDialog;
 
@@ -104,6 +107,21 @@ public abstract class BaseActivity<P extends BasePresenter> extends AppCompatAct
         super.onResume();
         if (null != mPresenter)
             mPresenter.attachView(this);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        // 白名单
+        boolean safe = AntiHijackingUtils.checkActivity(this);
+        // 系统桌面
+        boolean isHome = AntiHijackingUtils.isHome(this);
+        // 锁屏操作
+        boolean isReflectScreen = AntiHijackingUtils.isReflectScreen(this);
+        // 判断程序是否当前显示
+        if (!safe && !isHome && !isReflectScreen) {
+            ToastUtils.showLong(getString(R.string.warning));
+        }
     }
 
     @Override

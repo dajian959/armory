@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="warning">APP已被切换至后台运行，请确认当前环境是否安全！</string>
+</resources>
