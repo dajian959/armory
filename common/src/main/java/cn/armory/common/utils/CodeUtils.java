@@ -7,6 +7,9 @@ import android.graphics.Paint;
 
 import java.util.Random;
 
+/**
+ * 生成随机验证码
+ */
 public class CodeUtils {
 
     //    private static final char[] CHARS = {
