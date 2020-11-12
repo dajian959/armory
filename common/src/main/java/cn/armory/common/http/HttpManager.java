@@ -9,6 +9,8 @@ import java.util.concurrent.TimeUnit;
 
 import cn.armory.common.base.BaseObserver;
 import cn.armory.common.base.FileObserver;
+import cn.armory.common.http.cookie.CookieJarImpl;
+import cn.armory.common.http.cookie.PersistentCookieStore;
 import cn.armory.common.http.interceptor.BaseInterceptor;
 import cn.armory.common.http.interceptor.CacheInterceptor;
 import cn.armory.common.http.interceptor.Level;
@@ -99,7 +101,7 @@ public class HttpManager {
         HttpsUtils.SSLParams sslParams = HttpsUtils.getSslSocketFactory();
         okHttpClient = new OkHttpClient.Builder()
                 .cache(cache)
-                // .cookieJar(new CookieJarImpl(new PersistentCookieStore(mContext)))
+                .cookieJar(new CookieJarImpl(new PersistentCookieStore(mContext)))
                 .addInterceptor(new BaseInterceptor(headers))
                 .addInterceptor(new CacheInterceptor(mContext))
                 .sslSocketFactory(sslParams.sSLSocketFactory, sslParams.trustManager)
