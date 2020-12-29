@@ -5,8 +5,8 @@ ext {
             applicationId    : "cn.armory.explore",
             minSdkVersion    : 16,
             targetSdkVersion : 26,
-            versionCode      : 102,
-            versionName      : "1.0.2",
+            versionCode      : 101,
+            versionName      : "1.0.1",
     ]
     //version配置
     versions = [
