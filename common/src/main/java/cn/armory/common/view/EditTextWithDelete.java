@@ -11,7 +11,7 @@ import android.util.AttributeSet;
 import android.view.MotionEvent;
 
 import cn.armory.common.R;
-import cn.armory.common.utils.CheckStringUtils;
+import cn.armory.common.utils.CSUtils;
 
 
 
@@ -127,7 +127,7 @@ public class EditTextWithDelete extends AppCompatEditText {
         // 获得焦点，判断是否有内容
         if (this.hasFocus()) {
             // 如果没有内容，则保护显示清空按钮，否则就显示
-            if (CheckStringUtils.isEmpty(getText())) {
+            if (CSUtils.isEmpty(getText())) {
                 setCompoundDrawables(null, null, null, null);
             } else {
                 setCompoundDrawables(null, null, imgEnable, null);

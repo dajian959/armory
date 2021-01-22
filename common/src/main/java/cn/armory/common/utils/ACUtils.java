@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
-import android.support.annotation.StringRes;
 
 /**
  * Context相关.
@@ -68,7 +67,7 @@ public class ACUtils {
      */
     public static boolean isAppDebug() {
 
-        if (CheckStringUtils.isSpace(mContext.getPackageName())) return false;
+        if (CSUtils.isSpace(mContext.getPackageName())) return false;
         try {
             PackageManager pm = mContext.getPackageManager();
             ApplicationInfo ai = pm.getApplicationInfo(mContext.getPackageName(), 0);

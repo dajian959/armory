@@ -7,8 +7,8 @@ import java.util.regex.Pattern;
  * 字符串校验相关工具类
  */
 
-public class CheckStringUtils {
-    private CheckStringUtils() {
+public class CSUtils {
+    private CSUtils() {
         throw new UnsupportedOperationException("u can't instantiate me...");
     }
 
