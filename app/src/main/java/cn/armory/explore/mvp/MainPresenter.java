@@ -1,8 +1,8 @@
 package cn.armory.explore.mvp;
 
 import cn.armory.common.base.BaseObserver;
-import cn.armory.common.base.BasePresenter;
 import cn.armory.common.base.Result;
+import cn.armory.common.base.mvp.BasePresenter;
 import cn.armory.common.http.HttpManager;
 import cn.armory.explore.bean.TextBean;
 
@@ -13,19 +13,17 @@ import cn.armory.explore.bean.TextBean;
  * @describe
  */
 public class MainPresenter extends BasePresenter<MainView, MainModel> {
-
     @Override
     protected MainModel createModel() {
         return new MainModel();
     }
 
     public void getList() {
-        HttpManager.request(mModel.getCC(), new BaseObserver<TextBean>(mView) {
-
+        HttpManager.getInstance().request(model.getCC(), new BaseObserver<TextBean>() {
 
             @Override
             public void onSuccess(Result<TextBean> o) {
-
+                view.onTextSuccess();
             }
 
             @Override

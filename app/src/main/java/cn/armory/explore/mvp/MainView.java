@@ -1,6 +1,6 @@
 package cn.armory.explore.mvp;
 
-import cn.armory.common.base.BaseView;
+import cn.armory.common.base.IBaseView;
 
 /**
  * @author gjq
@@ -8,6 +8,6 @@ import cn.armory.common.base.BaseView;
  * @date 2020/8/27
  * @describe
  */
-public interface MainView extends BaseView {
+public interface MainView extends IBaseView {
     public void onTextSuccess();
 }

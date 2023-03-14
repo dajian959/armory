@@ -1,6 +1,7 @@
 package cn.armory.explore.fragment;
 
-import cn.armory.common.base.BaseFragment;
+import cn.armory.common.base.mvvm.DataBindingConfig;
+import cn.armory.common.base.mvvm.VmBaseFragment;
 
 /**
  * @author gjq
@@ -8,9 +9,15 @@ import cn.armory.common.base.BaseFragment;
  * @date 2020/8/27
  * @describe
  */
-public class MainFragment extends BaseFragment {
+public class MainFragment extends VmBaseFragment {
+
     @Override
-    protected void loadData() {
+    protected void initEvent() {
+
+    }
+
+    @Override
+    protected void initLocalData() {
 
     }
 
@@ -20,7 +27,27 @@ public class MainFragment extends BaseFragment {
     }
 
     @Override
+    protected void initView() {
+
+    }
+
+    @Override
+    protected void initListener() {
+
+    }
+
+    @Override
     protected void initData() {
 
+    }
+
+    @Override
+    protected void initLiveDataObserver() {
+
+    }
+
+    @Override
+    protected DataBindingConfig getDataBindingConfig() {
+        return null;
     }
 }

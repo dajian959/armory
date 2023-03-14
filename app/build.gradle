@@ -12,25 +12,33 @@ android {
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-
+    dataBinding {
+        enabled = true
+    }
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
     }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 }
 
 dependencies {
     implementation fileTree(dir: "libs", include: ["*.jar"])
     implementation project(':common')
-    implementation rootProject.ext.support['appcompat-v7']
     testImplementation rootProject.ext.support.junit
+    implementation rootProject.ext.support['appcompat-v7']
+    implementation rootProject.ext.support['recyclerview-v7']
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
     implementation 'com.haibin:calendarview:3.6.8'
-    implementation rootProject.ext.support['recyclerview-v7']
     implementation rootProject.ext.dependencies.butterknife
+    implementation rootProject.ext.dependencies['adapter-rxjava']
+
     annotationProcessor rootProject.ext.dependencies['butterknife-compiler']
 }

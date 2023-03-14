@@ -1,5 +1,6 @@
 package cn.armory.explore.activity;
 
+import android.content.Intent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -12,12 +13,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import butterknife.BindView;
-import cn.armory.common.base.BaseActivity;
+import cn.armory.common.base.mvp.VpBaseActivity;
 import cn.armory.explore.R;
 import cn.armory.explore.mvp.MainPresenter;
 import cn.armory.explore.mvp.MainView;
 
-public class MainActivity extends BaseActivity<MainPresenter> implements CalendarView.OnCalendarSelectListener, CalendarView.OnYearChangeListener, MainView {
+public class MainActivity extends VpBaseActivity<MainPresenter> implements CalendarView.OnCalendarSelectListener, CalendarView.OnYearChangeListener, MainView {
     @BindView(R.id.calendarView)
     CalendarView mCalendarView;
     @BindView(R.id.click)
@@ -33,8 +34,24 @@ public class MainActivity extends BaseActivity<MainPresenter> implements Calenda
     }
 
     @Override
+    protected void initLocalData() {
+
+    }
+
+    @Override
     protected int getLayoutId() {
         return R.layout.activity_meizu;
+    }
+
+    @Override
+    protected void initView() {
+
+    }
+
+
+    @Override
+    protected void initListener() {
+
     }
 
     @Override
@@ -49,6 +66,8 @@ public class MainActivity extends BaseActivity<MainPresenter> implements Calenda
                 if (calendarLayout.isExpand()) {
                     boolean a = calendarLayout.shrink();
                 } else calendarLayout.expand();
+                Intent intent = new Intent(MainActivity.this, VmMainActivity.class);
+                startActivity(intent);
             }
         });
         Map<String, Calendar> map = new HashMap<>();
