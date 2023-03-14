@@ -3,8 +3,9 @@ package cn.armory.common.utils;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.StringRes;
-import android.support.v4.content.SharedPreferencesCompat;
+
+import androidx.annotation.StringRes;
+import androidx.core.content.SharedPreferencesCompat;
 
 import java.util.HashSet;
 import java.util.Map;

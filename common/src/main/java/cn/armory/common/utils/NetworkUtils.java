@@ -1,16 +1,17 @@
 package cn.armory.common.utils;
 
+import static android.Manifest.permission.INTERNET;
+
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.support.annotation.RequiresPermission;
+
+import androidx.annotation.RequiresPermission;
 
 import java.net.InetAddress;
 import java.net.NetworkInterface;
 import java.net.SocketException;
 import java.util.Enumeration;
-
-import static android.Manifest.permission.INTERNET;
 
 /**
  * 网络相关工具类

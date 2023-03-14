@@ -5,7 +5,9 @@ import android.app.Application;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
-import android.support.annotation.NonNull;
+
+import androidx.annotation.NonNull;
+
 
 /**
  * Context相关.
@@ -40,7 +42,6 @@ public class ACUtils {
         if (mContext != null) {
             return mContext;
         }
-
         try {
             @SuppressLint("PrivateApi")
             Class<?> activityThread = Class.forName("android.app.ActivityThread");
@@ -52,8 +53,7 @@ public class ACUtils {
             init((Application) app);
             return mContext;
         } catch (Exception e) {
-            e.printStackTrace();
-
+            Logger.e(e.getMessage());
         }
 
         throw new NullPointerException("u should init first");
@@ -65,24 +65,34 @@ public class ACUtils {
      *
      * @return {@code true}: 是<br>{@code false}: 否
      */
-    public static boolean isAppDebug() {
+    public static boolean isAppDebug(Context context) {
 
-        if (CSUtils.isSpace(mContext.getPackageName())) return false;
+        if (CSUtils.isSpace(context.getPackageName())) {
+            return false;
+        }
         try {
-            PackageManager pm = mContext.getPackageManager();
-            ApplicationInfo ai = pm.getApplicationInfo(mContext.getPackageName(), 0);
+            PackageManager pm = context.getPackageManager();
+            ApplicationInfo ai = pm.getApplicationInfo(context.getPackageName(), 0);
             return ai != null && (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
         } catch (PackageManager.NameNotFoundException e) {
-            e.printStackTrace();
+            Logger.e(e.getMessage());
             return false;
         }
     }
 
-
-    public static <T> T checkNotNull(T obj) {
-        if (obj == null) {
-            throw new NullPointerException();
+    /**
+     * 获取版本号名称
+     *
+     * @return version
+     */
+    public static String getVersionName(Context context) {
+        String verName = "";
+        try {
+            verName = context.getPackageManager().
+                    getPackageInfo(context.getPackageName(), 0).versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            return verName;
         }
-        return obj;
+        return verName;
     }
 }

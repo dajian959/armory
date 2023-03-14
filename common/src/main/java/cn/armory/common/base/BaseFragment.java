@@ -1,22 +1,35 @@
 package cn.armory.common.base;
 
 import android.app.Activity;
-
-import android.content.Intent;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.pm.PackageManager;
+import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import butterknife.ButterKnife;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.annotation.Size;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.Fragment;
 
-public abstract class BaseFragment extends Fragment {
-    public View view;
+import com.tbruyelle.rxpermissions3.RxPermissions;
 
-    public Activity mContext;
+import autodispose2.AutoDispose;
+import autodispose2.androidx.lifecycle.AndroidLifecycleScopeProvider;
+import cn.armory.common.http.HttpManager;
+import cn.armory.common.utils.BarUtils;
+import cn.armory.common.view.LoadingDialog;
+import io.reactivex.rxjava3.functions.Consumer;
 
+public abstract class BaseFragment extends Fragment implements IBaseView {
+    protected Activity activity;
+    protected View rootView;
     /**
      * 是否初始化过布局
      */
@@ -29,25 +42,62 @@ public abstract class BaseFragment extends Fragment {
      * 是否加载过数据
      */
     protected boolean isDataInitiated;
+    private Dialog loadingDialog;
+    private RxPermissions rxPermissions;
 
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        activity = (AppCompatActivity) context;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        initLocalData();
+        HttpManager.getInstance().bindLifecycleOwner(this);
+        loadingDialog = setLoadingDialog();
+        rxPermissions = new RxPermissions(this);
+    }
 
     @Nullable
     @Override
-    public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        view = inflater.inflate(getLayoutId(), container, false);
-        ButterKnife.bind(this, view);
-        mContext = getActivity();
-
-        this.initData();
-        return view;
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        if (rootView != null) {
+            ViewGroup parent = (ViewGroup) rootView.getParent();
+            if (parent != null) {
+                parent.removeView(rootView);
+            }
+        } else {
+            initFragmentView(inflater, container);
+        }
+        return rootView;
     }
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        isViewInitiated=true;
+        isViewInitiated = true;
+        initEvent();
+        setStatusBar();
+        initView();
+        initListener();
         //加载数据
         prepareFetchData();
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        isViewInitiated = false;
+        isDataInitiated = false;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        this.rootView = null;
+        HttpManager.getInstance().unbindLifecycleOwner(this);
     }
 
     @Override
@@ -59,92 +109,129 @@ public abstract class BaseFragment extends Fragment {
         }
     }
 
-    public void prepareFetchData() {
-        prepareFetchData(false);
+    @Override
+    public void showLoading() {
+        if (loadingDialog == null) {
+            loadingDialog = new LoadingDialog(activity);
+        }
+        if (!loadingDialog.isShowing()) {
+            loadingDialog.show();
+        }
+    }
+
+    @Override
+    public void hideLoading() {
+        if (loadingDialog != null) {
+            loadingDialog.dismiss();
+        }
     }
 
     /**
      * 判断懒加载条件
-     *
-     * @param forceUpdate 强制更新，好像没什么用？
      */
-    public void prepareFetchData(boolean forceUpdate) {
-        if (isVisibleToUser && isViewInitiated && (!isDataInitiated || forceUpdate)) {
-            loadData();
+    private void prepareFetchData() {
+        if (isVisibleToUser && isViewInitiated && !isDataInitiated) {
+            initData();
             isDataInitiated = true;
         }
     }
 
+    protected void requestPermissions(String... permissions) {
+        if (hasPermissions(permissions)) {
+            return;
+        }
+        rxPermissions.request(permissions)
+                .to(AutoDispose.<Boolean>autoDisposable(AndroidLifecycleScopeProvider.from(this)))
+                .subscribe(new Consumer<Boolean>() {
+                    @Override
+                    public void accept(Boolean granted) {
+                        if (granted) {
+                            onPermissionsGranted();
+                        } else {
+                            onPermissionsDenied();
+                        }
+                    }
+                });
+    }
+
+
+    protected boolean hasPermissions(@Size(min = 1) @NonNull String... perms) {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+            return true;
+        }
+        for (String perm : perms) {
+            if (ContextCompat.checkSelfPermission(activity, perm)
+                    != PackageManager.PERMISSION_GRANTED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /**
-     * 懒加载
+     * 重写该方法以设置加载框
+     * 否则将使用默认加载框
+     *
+     * @return Dialog
      */
-    protected abstract void loadData();
+    protected Dialog setLoadingDialog() {
+        return new LoadingDialog(activity);
+    }
+
+    /**
+     * 此处设置沉浸式地方
+     */
+    protected void setStatusBar() {
+        BarUtils.setStatusBarColor(activity, Color.WHITE, true);
+    }
+
+    /**
+     * 初始化总线事件
+     * 如果想手动控制loading展示，去掉super方法即可
+     */
+    protected abstract void initEvent();
+
+    /**
+     * 已获取权限
+     */
+    protected void onPermissionsGranted() {
+    }
+
+    /**
+     * 未获取权限
+     */
+    protected void onPermissionsDenied() {
+    }
+
+    /**
+     * 在view加载前初始化的数据
+     */
+    protected abstract void initLocalData();
+
+    /**
+     * 用于加载fragment的view
+     */
+    protected abstract void initFragmentView(LayoutInflater inflater, ViewGroup container);
 
     /**
      * 获取布局ID
      *
-     * @return
+     * @return int
      */
     protected abstract int getLayoutId();
 
     /**
-     * 数据初始化操作
+     * 初始化view属性
+     */
+    protected abstract void initView();
+
+    /**
+     * 初始化操作
+     */
+    protected abstract void initListener();
+
+    /**
+     * 初始化数据
      */
     protected abstract void initData();
-
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        this.view = null;
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        ButterKnife.bind(getActivity()).unbind();
-    }
-
-    /**
-     * [页面跳转]
-     *
-     * @param clz
-     */
-    public void startActivity(Class<?> clz) {
-        startActivity(clz, null);
-    }
-
-
-    /**
-     * [携带数据的页面跳转]
-     *
-     * @param clz
-     * @param bundle
-     */
-    public void startActivity(Class<?> clz, Bundle bundle) {
-        Intent intent = new Intent();
-        intent.setClass(getActivity(), clz);
-        if (bundle != null) {
-            intent.putExtras(bundle);
-        }
-        startActivity(intent);
-    }
-
-
-    /**
-     * [含有Bundle通过Class打开编辑界面]
-     *
-     * @param cls
-     * @param bundle
-     * @param requestCode
-     */
-    public void startActivityForResult(Class<?> cls, Bundle bundle,
-                                       int requestCode) {
-        Intent intent = new Intent();
-        intent.setClass(getActivity(), cls);
-        if (bundle != null) {
-            intent.putExtras(bundle);
-        }
-        startActivityForResult(intent, requestCode);
-    }
 }

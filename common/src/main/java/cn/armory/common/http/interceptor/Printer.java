@@ -1,7 +1,6 @@
 package cn.armory.common.http.interceptor;
 
 import android.text.TextUtils;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -13,7 +12,6 @@ import java.util.List;
 import okhttp3.FormBody;
 import okhttp3.Request;
 import okio.Buffer;
-
 
 
 class Printer {
@@ -54,7 +52,7 @@ class Printer {
         String requestBody = LINE_SEPARATOR + BODY_TAG + LINE_SEPARATOR + bodyToString(request);
         String tag = builder.getTag(true);
         if (builder.getLogger() == null)
-            I.log(builder.getType(), tag, REQUEST_UP_LINE);
+            DefaultLog.log(builder.getType(), tag, REQUEST_UP_LINE);
         logLines(builder.getType(), tag, new String[]{URL_TAG + request.url()}, builder.getLogger(), false);
         logLines(builder.getType(), tag, getRequest(request, builder.getLevel()), builder.getLogger(), true);
         if (request.body() instanceof FormBody) {
@@ -72,7 +70,7 @@ class Printer {
             logLines(builder.getType(), tag, requestBody.split(LINE_SEPARATOR), builder.getLogger(), true);
         }
         if (builder.getLogger() == null)
-            I.log(builder.getType(), tag, END_LINE);
+            DefaultLog.log(builder.getType(), tag, END_LINE);
     }
 
     static void printJsonResponse(LoggingInterceptor.Builder builder, long chainMs, boolean isSuccessful,
@@ -80,7 +78,7 @@ class Printer {
         String responseBody = LINE_SEPARATOR + BODY_TAG + LINE_SEPARATOR + getJsonString(bodyString);
         String tag = builder.getTag(false);
         if (builder.getLogger() == null)
-            I.log(builder.getType(), tag, RESPONSE_UP_LINE);
+            DefaultLog.log(builder.getType(), tag, RESPONSE_UP_LINE);
 
         logLines(builder.getType(), tag, getResponse(headers, chainMs, code, isSuccessful,
                 builder.getLevel(), segments), builder.getLogger(), true);
@@ -88,13 +86,13 @@ class Printer {
             logLines(builder.getType(), tag, responseBody.split(LINE_SEPARATOR), builder.getLogger(), true);
         }
         if (builder.getLogger() == null)
-            I.log(builder.getType(), tag, END_LINE);
+            DefaultLog.log(builder.getType(), tag, END_LINE);
     }
 
     static void printFileRequest(LoggingInterceptor.Builder builder, Request request) {
         String tag = builder.getTag(true);
         if (builder.getLogger() == null)
-            I.log(builder.getType(), tag, REQUEST_UP_LINE);
+            DefaultLog.log(builder.getType(), tag, REQUEST_UP_LINE);
         logLines(builder.getType(), tag, new String[]{URL_TAG + request.url()}, builder.getLogger(), false);
         logLines(builder.getType(), tag, getRequest(request, builder.getLevel()), builder.getLogger(), true);
         if (request.body() instanceof FormBody) {
@@ -112,20 +110,20 @@ class Printer {
             logLines(builder.getType(), tag, OMITTED_REQUEST, builder.getLogger(), true);
         }
         if (builder.getLogger() == null)
-            I.log(builder.getType(), tag, END_LINE);
+            DefaultLog.log(builder.getType(), tag, END_LINE);
     }
 
     static void printFileResponse(LoggingInterceptor.Builder builder, long chainMs, boolean isSuccessful,
                                   int code, String headers, List<String> segments) {
         String tag = builder.getTag(false);
         if (builder.getLogger() == null)
-            I.log(builder.getType(), tag, RESPONSE_UP_LINE);
+            DefaultLog.log(builder.getType(), tag, RESPONSE_UP_LINE);
 
         logLines(builder.getType(), tag, getResponse(headers, chainMs, code, isSuccessful,
                 builder.getLevel(), segments), builder.getLogger(), true);
         logLines(builder.getType(), tag, OMITTED_RESPONSE, builder.getLogger(), true);
         if (builder.getLogger() == null)
-            I.log(builder.getType(), tag, END_LINE);
+            DefaultLog.log(builder.getType(), tag, END_LINE);
     }
 
     private static String[] getRequest(Request request, Level level) {
@@ -189,7 +187,7 @@ class Printer {
                 int end = (i + 1) * MAX_LONG_SIZE;
                 end = end > line.length() ? line.length() : end;
                 if (logger == null) {
-                    I.log(type, tag, DEFAULT_LINE + line.substring(start, end));
+                    DefaultLog.log(type, tag, DEFAULT_LINE + line.substring(start, end));
                 } else {
                     logger.log(type, tag, line.substring(start, end));
                 }

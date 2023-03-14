@@ -1,6 +1,7 @@
 package cn.armory.common.base;
 
 import com.google.gson.JsonParseException;
+import com.jeremyliao.liveeventbus.LiveEventBus;
 
 import org.json.JSONException;
 
@@ -10,15 +11,10 @@ import java.net.UnknownHostException;
 import java.text.ParseException;
 
 import cn.armory.common.http.HttpManager;
-import io.reactivex.observers.DisposableObserver;
+import io.reactivex.rxjava3.observers.DisposableObserver;
 import retrofit2.HttpException;
 
 public abstract class BaseObserver<T> extends DisposableObserver<Result<T>> {
-    protected BaseView view;
-    /**
-     * 网络连接失败  无网
-     */
-    public static final int NETWORK_ERROR = 100000;
     /**
      * 解析数据失败
      */
@@ -40,38 +36,35 @@ public abstract class BaseObserver<T> extends DisposableObserver<Result<T>> {
      */
     public static final int NOT_TRUE_OVER = 1004;
 
-    public BaseObserver(BaseView view) {
-        this.view = view;
-    }
-
     public BaseObserver() {
     }
 
     @Override
     protected void onStart() {
-        if (view != null) {
-            view.showLoading();
+        if (HttpManager.count.get() == 0) {
+            LiveEventBus.get(BaseEvent.IS_SHOW_LOADING, Boolean.class).post(true);
         }
+        HttpManager.count.incrementAndGet();
     }
 
     @Override
     public void onNext(Result<T> o) {
-        try {
-            if (view != null) {
-                view.hideLoading();
-            }
-            if (o.getCode() == HttpManager.code)
-                onSuccess(o);
-            else onError(o.getMsg());
-        } catch (Exception e) {
-            onError(e);
+        int count = HttpManager.count.decrementAndGet();
+        if (count == 0) {
+            LiveEventBus.get(BaseEvent.IS_SHOW_LOADING, Boolean.class).post(false);
+        }
+        if (o.getCode() == HttpManager.code) {
+            onSuccess(o);
+        } else {
+            onError(o.getMsg());
         }
     }
 
     @Override
     public void onError(Throwable e) {
-        if (view != null) {
-            view.hideLoading();
+        int count = HttpManager.count.decrementAndGet();
+        if (count == 0) {
+            LiveEventBus.get(BaseEvent.IS_SHOW_LOADING, Boolean.class).post(false);
         }
         if (e instanceof HttpException) {
             //   HTTP错误
@@ -122,7 +115,6 @@ public abstract class BaseObserver<T> extends DisposableObserver<Result<T>> {
         }
     }
 
-    //消失写到这 有一定的延迟  对dialog显示有影响
     @Override
     public void onComplete() {
 

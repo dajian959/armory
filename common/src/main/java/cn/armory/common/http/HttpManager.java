@@ -3,12 +3,16 @@ package cn.armory.common.http;
 import android.content.Context;
 import android.text.TextUtils;
 
+import androidx.lifecycle.LifecycleOwner;
+
 import java.io.File;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import autodispose2.AutoDispose;
+import autodispose2.androidx.lifecycle.AndroidLifecycleScopeProvider;
 import cn.armory.common.base.BaseObserver;
-import cn.armory.common.base.FileObserver;
 import cn.armory.common.http.cookie.CookieJarImpl;
 import cn.armory.common.http.cookie.PersistentCookieStore;
 import cn.armory.common.http.interceptor.BaseInterceptor;
@@ -16,17 +20,18 @@ import cn.armory.common.http.interceptor.CacheInterceptor;
 import cn.armory.common.http.interceptor.Level;
 import cn.armory.common.http.interceptor.LoggingInterceptor;
 import cn.armory.common.utils.ACUtils;
+import cn.armory.common.utils.HttpsUtils;
 import cn.armory.common.utils.Logger;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.schedulers.Schedulers;
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.Observer;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 import okhttp3.Cache;
 import okhttp3.ConnectionPool;
 import okhttp3.OkHttpClient;
 import okhttp3.internal.platform.Platform;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.adapter.rxjava3.RxJava3CallAdapterFactory;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 
@@ -34,55 +39,45 @@ import retrofit2.converter.gson.GsonConverterFactory;
  * RetrofitClient封装单例类, 实现网络请求
  */
 public class HttpManager {
+    //原子计数器
+    public static AtomicInteger count = new AtomicInteger(0);
     //超时时间
     private static final int DEFAULT_TIMEOUT = 20;
     //缓存时间
     private static final int CACHE_TIMEOUT = 10 * 1024 * 1024;
     //服务端根路径
     public static String baseUrl = "";
-    public static boolean debug = false;
-    public static String version = "";
     public static int code = 0;
-    private static Context mContext = ACUtils.getApplicationContext();
-    private static OkHttpClient okHttpClient;
     private static Retrofit retrofit;
-    private Cache cache = null;
     private File httpCacheDirectory;
-    private static volatile HttpManager manager;
-    private static CompositeDisposable compositeDisposable;
+    private LifecycleOwner lifecycleOwner;
 
     /**
      * 请在application的onCreate()调用此方法
      *
      * @param url         全局url
      * @param successCode 网络请求返回的状态码---正确拿到数据的状态码
-     * @param isDebug     是否debug---BuildConfig.BUILD_TYPE
-     * @param versionName 版本号---BuildConfig.VERSION_NAME
      */
-    public static void init(String url, int successCode, boolean isDebug, String versionName) {
+    public static void init(String url, int successCode) {
         baseUrl = url;
-        debug = isDebug;
-        version = versionName;
         code = successCode;
     }
 
+    private static class SingletonHolder {
+        private static final HttpManager MANAGER = new HttpManager();
+    }
+
     public static HttpManager getInstance() {
-        if (manager == null) {
-            synchronized (HttpManager.class) {
-                if (manager == null)
-                    manager = new HttpManager();
-            }
-        }
-        return manager;
+        return SingletonHolder.MANAGER;
     }
 
 
     private HttpManager() {
-        this(baseUrl, null);
+        this(baseUrl, null, null);
     }
 
-    private HttpManager(String url, Map<String, String> headers) {
-
+    private HttpManager(String url, Map<String, String> headers, Cache cache) {
+        Context mContext = ACUtils.getApplicationContext();
         if (TextUtils.isEmpty(url)) {
             url = baseUrl;
         }
@@ -98,8 +93,10 @@ public class HttpManager {
         } catch (Exception e) {
             Logger.e("Could not create http cache", e);
         }
+        boolean debug = ACUtils.isAppDebug(mContext);
+        String version = ACUtils.getVersionName(mContext);
         HttpsUtils.SSLParams sslParams = HttpsUtils.getSslSocketFactory();
-        okHttpClient = new OkHttpClient.Builder()
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .cache(cache)
                 .cookieJar(new CookieJarImpl(new PersistentCookieStore(mContext)))
                 .addInterceptor(new BaseInterceptor(headers))
@@ -123,7 +120,7 @@ public class HttpManager {
         retrofit = new Retrofit.Builder()
                 .client(okHttpClient)
                 .addConverterFactory(GsonConverterFactory.create())
-                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
+                .addCallAdapterFactory(RxJava3CallAdapterFactory.create())
                 .baseUrl(url)
                 .build();
 
@@ -147,35 +144,30 @@ public class HttpManager {
      * @param observable
      * @param observer
      */
-    @SuppressWarnings("unchecked")
-    public static void request(Observable<?> observable, BaseObserver observer) {
-        if (compositeDisposable == null) {
-            compositeDisposable = new CompositeDisposable();
-        }
-        compositeDisposable.add(observable.subscribeOn(Schedulers.io())
+    public <T> void request(Observable<T> observable, BaseObserver<T> observer) {
+        observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(observer));
+                .to(AutoDispose.<T>autoDisposable(AndroidLifecycleScopeProvider.from(lifecycleOwner)))
+                .subscribe((Observer<? super T>) observer);
     }
 
     /**
-     * 网络文件请求
+     * 设置网络生命周期对象
      *
-     * @param observable
-     * @param observer
+     * @param lifecycleOwner
      */
-    @SuppressWarnings("unchecked")
-    public static void requestFile(Observable<?> observable, FileObserver observer) {
-        if (compositeDisposable == null) {
-            compositeDisposable = new CompositeDisposable();
-        }
-        compositeDisposable.add(observable.subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(observer));
+    public void bindLifecycleOwner(LifecycleOwner lifecycleOwner) {
+        this.lifecycleOwner = lifecycleOwner;
     }
 
-    public static void removeDisposable() {
-        if (compositeDisposable != null) {
-            compositeDisposable.dispose();
+    /**
+     * 解绑，防止异常情况下内存泄漏
+     *
+     * @param lifecycleOwner
+     */
+    public void unbindLifecycleOwner(LifecycleOwner lifecycleOwner) {
+        if (this.lifecycleOwner == lifecycleOwner) {
+            this.lifecycleOwner = null;
         }
     }
 }

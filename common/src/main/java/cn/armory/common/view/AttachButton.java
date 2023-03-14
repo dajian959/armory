@@ -2,12 +2,13 @@ package cn.armory.common.view;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.BounceInterpolator;
+
+import androidx.annotation.Nullable;
 
 /**
  * 自定义View实现拖动并自动吸边效果
